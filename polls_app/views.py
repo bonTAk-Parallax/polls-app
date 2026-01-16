@@ -30,14 +30,18 @@ class DetailView(generic.DetailView):
     template_name = "polls_app/detail.html"
 
     def get_queryset(self):
-        return Question.objects.filter(pub_date__lte = timezone.now())
+        return Question.objects.filter(
+            question_choies__isnull = False,
+            pub_date__lte = timezone.now()).distinct()
 
 class ResultsView(generic.DetailView):
     model = Question
     template_name = "polls_app/results.html"
 
     def get_queryset(self):
-        return Question.objects.filter(pub_date__lte = timezone.now())
+        return Question.objects.filter(
+            question_choies__isnull = False,
+            pub_date__lte = timezone.now()).distinct()
 
 
 def vote(request, question_id):

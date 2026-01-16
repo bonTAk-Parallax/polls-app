@@ -96,23 +96,24 @@ class QuestionDetailViewTests(TestCase):
 
     def test_past_question(self):
         past_question = create_question(question_text="Past question", days=-5)
+        choice = Choices.objects.create(question=past_question, choice_text = "ONE", votes=0 )
         url = reverse("polls_app:detail", args=(past_question.id,))
         response = self.client.get(url)
         self.assertContains(response, past_question.question_text)
 
-    # def test_for_question_with_no_choice(self):
-    #     question = create_question(question_text="Question with no choices", days=-1)
-    #     url = reverse("polls_app:detail", args=(question.id,))
-    #     response = self.client.get(url)
-    #     self.assertQuerySetEqual(response, [])
+    def test_for_question_with_no_choice(self):
+        question = create_question(question_text="Question with no choices", days=-1)
+        url = reverse("polls_app:detail", args=(question.id,))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
 
-    # def test_for_question_with_choices(self):
-    #     question = create_question(question_text="Question with choice", days=-1)
-    #     choice = Choices.objects.create(question=question, choice_text = "ONE", votes=0 )
-    #     choice = Choices.objects.create(question=question, choice_text = "TWO", votes=0 )
-    #     url = reverse("polls_app:detail", args=(question.id,))
-    #     response = self.client.get(url)
-    #     self.assertTrue(response.exists())
+    def test_for_question_with_choices(self):
+        question = create_question(question_text="Question with choice", days=-1)
+        choice = Choices.objects.create(question=question, choice_text = "ONE", votes=0 )
+        choice = Choices.objects.create(question=question, choice_text = "TWO", votes=0 )
+        url = reverse("polls_app:detail", args=(question.id,))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
 
 
 class QuestionResultViewTests(TestCase):
@@ -124,6 +125,21 @@ class QuestionResultViewTests(TestCase):
 
     def test_past_question(self):
         past_question = create_question(question_text="Past question", days=-5)
+        choice = Choices.objects.create(question=past_question, choice_text = "ONE", votes=0 )
         url = reverse("polls_app:results", args=(past_question.id,))
         response = self.client.get(url)
         self.assertContains(response, past_question.question_text)
+
+    def test_for_question_with_no_choice(self):
+        question = create_question(question_text="Question with no choices", days=-1)
+        url = reverse("polls_app:results", args=(question.id,))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_for_question_with_choices(self):
+        question = create_question(question_text="Question with choice", days=-1)
+        choice = Choices.objects.create(question=question, choice_text = "ONE", votes=0 )
+        choice = Choices.objects.create(question=question, choice_text = "TWO", votes=0 )
+        url = reverse("polls_app:results", args=(question.id,))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
